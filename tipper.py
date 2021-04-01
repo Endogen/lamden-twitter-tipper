@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-CONSUMER_KEY = "<consumer_key>"
-CONSUMER_SEC = "<consumer_sec>"
-ACCESS_TKN_KEY = "<access_tkn_key>"
-ACCESS_TKN_SEC = "<access_tkn_sec>"
+CONSUMER_KEY = "<some key>"
+CONSUMER_SEC = "<some secret>"
+ACCESS_TKN_KEY = "<some access token key>"
+ACCESS_TKN_SEC = "<some access token secret>"
 
 AMOUNT_TAU = 10
-BOT_PRIVKEY = "<bot_privkey>"
+BOT_PRIVKEY = "<some Lamden private key>"
 
 TESTNET_URL = "https://testnet-master-1.lamden.io"
 MAINNET_URL = "https://masternode-01.lamden.io"
@@ -105,7 +105,19 @@ class HandleListener(StreamListener):
         logging.error(status)
 
 
+def create_kill_script(filename):
+    shebang = "#!/bin/bash"
+    command = f"kill -9 {os.getpid()}"
+
+    with open(filename, "w") as f:
+        f.truncate(0)
+        f.write(f"{shebang}\n\n{command}")
+
+
 if __name__ == '__main__':
+    # Create script to kill bot by PID
+    create_kill_script("kill.sh")
+
     if os.path.isfile(USER_FILE):
         with open(USER_FILE, "r") as f:
             user_list = f.read().splitlines()
@@ -118,7 +130,7 @@ if __name__ == '__main__':
     api = tweepy.API(auth)
 
     stream = Stream(auth, HandleListener(api))
-    stream.filter(track=[f"@{api.me().name}"])
+    stream.filter(track=[f"@{api.me().screen_name}"])
 
     while True:
         time.sleep(0.01)
